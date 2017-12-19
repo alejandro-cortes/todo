@@ -1,26 +1,12 @@
 <template>
     <div class="container">
         <div class="box">
-            <div class="field is-grouped">
-                <p class="control is-expanded">
-                    <input class="input" type="text" placeholder="Nuevo recordatorio" v-model="todoItemText">
-                </p>
-                <p class="control">
-                    <a class="button is-info" @click="addTodo">
-                        Agregar
-                    </a>
-                </p>
-            </div>
+            <TodoInput @update="addTodo"></TodoInput>
         </div>
         <table class="table is-bordered">
-            <tr v-for="(todo, index) in items" :key="index">
-                <td class="is-fullwidth" style="cursor: pointer" :class="{ 'is-done': todo.done }" @click="toggleDone(todo)">
-                    {{ todo.text }}
-                </td>
-                <td class="is-narrow">
-                    <a class="button is-danger is-small" @click="removeTodo(todo)">Eliminar</a>
-                </td>
-            </tr>
+        	<TodoItem v-for="(todo, index) in items" :key="index" :id="todo.id" :text="todo.text" :done="todo.done" 
+        		@remove="removeTodo"
+        		@toggle="toggleDone"></TodoItem>
         </table>
     </div>
 </template>
@@ -34,6 +20,8 @@
      *   addiciones o elimicaiones tomen efecto en el backend asi como la base de datos.
      */
      import axios from 'axios';
+     import TodoInput from './TodoInput'
+     import TodoItem from './TodoItem'
      
     export default {
         data () {
@@ -42,6 +30,11 @@
                 items: []
             }
         },
+        components : {
+            'TodoInput': TodoInput,
+            'TodoItem': TodoItem 
+        },
+        
         mounted () {
             /*this.items = [
                 { text: 'Primer recordatorio', done: true },
@@ -59,36 +52,35 @@
             .catch(e => {
             	alert(e)
             })
-
-           
           },
         methods: {
-            addTodo () {
-                let text = this.todoItemText.trim()
-                if (text !== '') {
-                	 axios.post("/todos", {
-                		 text: text, done: false
-                	    })
-                	    .then(response => {
-                	    	this.items.push({ id: response.data.id, text: response.data.text, done: response.data.done })
-                            this.todoItemText = ''
-                	    })
-                	    .catch(e => {
-                	      alert(e)
-                	    })
-                }
+            addTodo (text) {
+                
+              	 axios.post("/todos", {
+              		 text: text, done: false
+              	    })
+              	    .then(response => {
+              	    	this.items.push({ id: response.data.id, text: response.data.text, done: response.data.done })
+                          
+              	    })
+              	    .catch(e => {
+              	      alert(e)
+              	    })
+                
             },
             removeTodo (todo) {
-                axios.delete('/todos/'+todo.id)
+                axios.delete('/todos/'+todo)
                 .then(response => {
-                	this.items = this.items.filter(item => item !== todo)
+                	this.items = this.items.filter(item => item.id !== todo)
         	    })
         	    .catch(e => {
         	    	alert(e)
         	    })
             },
-            toggleDone (todo) {
-                axios.put("/todos/"+todo.id, {
+            toggleDone (id) {
+            	let index = this.items.findIndex(item => item.id === id)
+            	let todo = this.items[index]
+                axios.put("/todos/"+id, {
            		 done: !todo.done
            	    })
            	    .then(response => { todo.done = !todo.done; })
