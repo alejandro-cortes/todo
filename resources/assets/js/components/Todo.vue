@@ -33,35 +33,68 @@
      * - En addTodo, removeTodo y toggleTodo deben hacer los cambios pertinentes para que las modificaciones,
      *   addiciones o elimicaiones tomen efecto en el backend asi como la base de datos.
      */
+     import axios from 'axios';
+     
     export default {
         data () {
             return {
                 todoItemText: '',
-                items: [],
+                items: []
             }
         },
         mounted () {
-            this.items = [
+            /*this.items = [
                 { text: 'Primer recordatorio', done: true },
                 { text: 'Segundo recordatorio', done: false },
                 { text: 'Tercero recordatorio', done: false },
                 { text: 'Cuarto recordatorio', done: true },
                 { text: 'Quinto recordatorio', done: false },
-            ]
+            ]*/
         },
+        created() {
+            axios.get("/todos")
+            .then(response => {
+              this.items = response.data
+            })
+            .catch(e => {
+            	alert(e)
+            })
+
+           
+          },
         methods: {
             addTodo () {
                 let text = this.todoItemText.trim()
                 if (text !== '') {
-                    this.items.push({ text: text, done: false })
-                    this.todoItemText = ''
+                	 axios.post("/todos", {
+                		 text: text, done: false
+                	    })
+                	    .then(response => {
+                	    	this.items.push({ id: response.data.id, text: response.data.text, done: response.data.done })
+                            this.todoItemText = ''
+                	    })
+                	    .catch(e => {
+                	      alert(e)
+                	    })
                 }
             },
             removeTodo (todo) {
-                this.items = this.items.filter(item => item !== todo)
+                axios.delete('/todos/'+todo.id)
+                .then(response => {
+                	this.items = this.items.filter(item => item !== todo)
+        	    })
+        	    .catch(e => {
+        	    	alert(e)
+        	    })
             },
             toggleDone (todo) {
-                todo.done = !todo.done
+                axios.put("/todos/"+todo.id, {
+           		 done: !todo.done
+           	    })
+           	    .then(response => { todo.done = !todo.done; })
+           	    .catch(e => {
+           	    	alert(e)
+           	    })
             }
         }
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Todo;
 
 /**
  * En esta clase deben implementar los metodos vacios de acuerdo a lo
@@ -22,7 +23,7 @@ class TodoController extends Controller
      */
     public function index()
     {
-        // TODO
+        return response()->json(Todo::orderBy('created_at')->get(), 200);
     }
 
     /**
@@ -35,7 +36,17 @@ class TodoController extends Controller
      */
     public function store(Request $request)
     {
-        // TODO
+    	$req = $request->all();
+    	try {
+	        $todo = new Todo();
+	        $todo->text = $req['text'];
+	        $todo->done = $req['done'];
+	        $todo->save();
+	        return response()->json($todo, 200);
+    	} catch (Exception $e){
+    		return response()->json($e, 400);
+    	}
+        
     }
 
     /**
@@ -48,7 +59,16 @@ class TodoController extends Controller
      */
     public function update($id, Request $request)
     {
-        // TODO
+    	$req = $request->all();
+    	try {
+	        $todo = Todo::find($id);
+	        $todo->done = $req['done'];
+	        $todo->save();
+	        return response()->json($todo, 200);
+    	} catch (Exception $e){
+    		return response()->json($e, 400);
+    	}
+        
     }
 
     /**
@@ -60,6 +80,7 @@ class TodoController extends Controller
      */
     public function delete($id)
     {
-        // TODO
+    	$result = Todo::destroy($id);
+    	return response()->json([], $result==1?200:400);
     }
 }
