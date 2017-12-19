@@ -18,10 +18,10 @@
     props: {id: Number, text: String, done: Boolean},
     methods: {
     	removeTodo(id) {
-            this.$emit('remove', id)
+    		this.$store.dispatch('removeTodo', id)
         },
         toggleDone(id) {
-        	this.$emit('toggle', id)
+        	this.$store.dispatch('toggleDone', id)
         }
     }
   };

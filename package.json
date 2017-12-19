@@ -19,6 +19,6 @@
     "dependencies": {
         "buefy": "^0.5.3",
         "bulma": "^0.5.3",
-        "vuex": "^2.4.1"
+        "vuex": "^2.5.0"
     }
 }

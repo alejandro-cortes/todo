@@ -20,11 +20,8 @@
     },
     methods: {
     	addTodo () {
-            let text = this.todoItemText.trim()
-            if (text !== '') {
-            	this.$emit('update', text)
-            	this.todoItemText = ''
-            }
+    		this.$store.dispatch('addTodo', this.todoItemText)
+    		this.todoItemText = '';
         },
     }
   };
